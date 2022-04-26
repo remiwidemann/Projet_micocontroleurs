@@ -1,0 +1,27 @@
+\\ Code realise par Yves Pelletier.
+\\ Mesure de la masse toutes les secondes.
+
+#include "HX711.h"
+// HX711 circuit wiring
+const int broche_DT = 5;
+const int broche_SCK = 6;
+HX711 balance;
+
+void setup(){
+Serial.begin(9600);
+Serial.println("Initialisation de la balance...");
+balance.begin(broche_DT, broche_SCK);
+while (!balance.is_ready())
+  {
+    ;
+  }
+balance.set_scale(2266); //calibration: le paramètre dépend de votre cellule de charge.
+balance.tare(); //ajustement du zéro
+Serial.println("La balance est prete!");
+}
+
+void loop(){
+Serial.println(balance.get_units(10));
+Serial.println(" grammes");
+delay(1000);
+}
