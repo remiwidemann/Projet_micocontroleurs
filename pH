@@ -1,0 +1,77 @@
+// Code adapte de celui de Martin Vérot.
+// Mesure du pH du milieu apres etallonage (pH 4 et 7) avec un rythme d'une mesure par seconde.
+// Voir code original pour l'utilisation de l'ecran LCD et de bouton n°3.
+
+const int pinpH = A0 ;
+const int overpH = 8 ;
+
+//Boutons de mesure
+const int readpH = 9 ;
+const int pH7 = 10 ;
+const int pH4 = 11 ;
+
+//Variables intermédiaires
+int cal4 =0;
+int cal7 =0;
+float slope =0.;
+float intercept=0.;
+bool calibrated=false;
+int pHRaw;
+float pHfull;
+String line="";
+
+void setup(){
+pinMode(pinpH, INPUT);
+pinMode(overpH, INPUT); //si au dela d'un seuil fixé via potentiomètre
+pinMode(readpH, INPUT_PULLUP); // lancer lecture du pH
+pinMode(pH7, INPUT_PULLUP); // tampon pH7
+pinMode(pH4, INPUT_PULLUP); // tampon pH4
+Serial.begin(9600);
+while(calibrated == false){
+    pHRaw= ReadPH();//récupération de la valeur brute moyennée sur 200 valeurs
+    
+    boolean calpH4 = digitalRead(pH4);
+    if(calpH4 == LOW){//si le bouton pH4 appuyé, alors
+        cal4 = pHRaw;
+        Serial.println(cal4);
+        calibrated = false;
+    }
+
+    boolean calpH7 = digitalRead(pH7);
+    if(calpH7 == LOW){//si le bouton pH7 appuyé, alors
+        cal7 = pHRaw;
+        Serial.println(cal7);        
+        calibrated = false;
+    }
+
+    if(cal4 != 0 && cal7 != 0 && calibrated == false){
+        slope = (cal7-cal4)/3; // On calcule les parametres de la courbe pH=f(pHraw)=a*pHraw+b
+        intercept = cal4-4*slope;
+        calibrated = true;  
+    }
+    
+  }
+  
+}
+
+
+long ReadPH(){
+  int buf[10],temp;
+  float avgValue=0.0;
+  analogRead(pinpH);
+  for(int i=0;i<200;i++){ //200 mesures
+    buf[i]=analogRead(pinpH);
+    delay(10);
+    avgValue+=(float) buf[i];}
+  avgValue/=200;
+  
+  return avgValue;
+}
+
+void loop(){
+\\ Une mesure par seconde 
+pHRaw= ReadPH();
+pHfull=(pHRaw-intercept)/slope;
+Serial.println(pHfull);
+delay(1000);
+}
