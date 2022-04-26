@@ -1,0 +1,28 @@
+\\ Programme initial fourni par Martin Vérot. (Auteur·rice initial·e ?)
+\\ Ce programme permet de faire tourner le moteur d'un demi-tour (= 800 pas) toutes les secondes.
+
+#define dirPin 3
+#define stepPin 2
+#define stepsPerRevolution 1600
+float pi=3.1415926535897932384626433832795;
+float pul=2*pi/1600;
+
+void setup(){
+pinMode(stepPin, OUTPUT);
+pinMode(dirPin, OUTPUT);
+Serial.begin(9600);
+}
+
+void loop(){
+// Set the spinning direction clockwise:
+digitalWrite(dirPin, HIGH);
+// Spin the stepper motor 1 revolution slowly 800:
+for(int i =0; i<800; i++){
+// These four lines result in 1 step:
+digitalWrite(stepPin, HIGH);
+delayMicroseconds((acos(i+1)-acos(i))/pul);
+digitalWrite(stepPin, LOW);
+delayMicroseconds((acos(i+1)-acos(i))/pul);
+}
+delay(1000);
+}
