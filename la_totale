@@ -1,5 +1,5 @@
-\\ Inspiré des travaux de Martin Vérot & Yves Pelletier.
-\\ Programme permettant la réalisation d'un titrage pH-métrique automatisé.
+// Inspiré des travaux de Martin Vérot & Yves Pelletier.
+// Programme permettant la réalisation d'un titrage pH-métrique automatisé.
 
 //PH mètre
 const int pinpH = A0 ;
@@ -79,7 +79,7 @@ balance.set_scale(2266); //calibration: le paramètre dépend de votre cellule d
 balance.tare(); //ajustement du zéro
 Serial.println("La balance est prete ! Le titrage va commencer ! Assurez-vous de ne plus toucher à la balance pour ne pas fausser les mesures.");
 delay(100);
-Serial.println("C'est parti!")
+Serial.println("C'est parti!");
 }
 
 long ReadPH(){
