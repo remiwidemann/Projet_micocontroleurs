@@ -69,7 +69,7 @@ long ReadPH(){
 }
 
 void loop(){
-\\ Une mesure par seconde 
+// Une mesure par seconde 
 pHRaw= ReadPH();
 pHfull=(pHRaw-intercept)/slope;
 Serial.println(pHfull);
