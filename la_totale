@@ -1,0 +1,113 @@
+\\ Inspiré des travaux de Martin Vérot & Yves Pelletier.
+\\ Programme permettant la réalisation d'un titrage pH-métrique automatisé.
+
+//PH mètre
+const int pinpH = A0 ;
+const int overpH = 8 ;
+//Boutons de mesure
+const int readpH = 9 ;
+const int pH7 = 10 ;
+const int pH4 = 11 ;
+
+//Variables intermédiaires
+int cal4 =0;
+int cal7 =0;
+float slope =0.;
+float intercept=0.;
+bool calibrated=false;
+int pHRaw;
+float pHfull;
+String line="";
+
+// Balance
+#include "HX711.h"
+const int broche_DT = 5;
+const int broche_SCK = 6;
+HX711 balance;
+
+// Pompe
+#define dirPin 4
+#define stepPin 3
+#define stepsPerRevolution 1600
+float pi=3.1415926535897932384626433832795;
+float pul=2*pi/1600;
+
+void setup(){
+pinMode(stepPin, OUTPUT);
+pinMode(dirPin, OUTPUT);
+pinMode(pinpH, INPUT);
+pinMode(overpH, INPUT); //si au dela d'un seuil fixé via potentiomètre
+pinMode(readpH, INPUT_PULLUP); // lancer lecture du pH
+pinMode(pH7, INPUT_PULLUP); // tampon pH7
+pinMode(pH4, INPUT_PULLUP); // tampon pH4
+Serial.begin(9600);
+
+// Etalonnage du pH-metre
+while(calibrated == false){
+    pHRaw= ReadPH();//récupération de la valeur brute moyennée sur 10 valeurs
+    boolean calpH4 = digitalRead(pH4);
+    if(calpH4 == LOW){//si le bouton pH4 appuyé, alors
+        cal4 = pHRaw;
+        Serial.println(cal4);
+        calibrated = false;
+    }
+    boolean calpH7 = digitalRead(pH7);
+    if(calpH7 == LOW){//si le bouton pH7 appuyé, alors
+        cal7 = pHRaw;
+        Serial.println(cal7);        
+        calibrated = false;
+    }
+
+    if(cal4 != 0 && cal7 != 0 && calibrated == false){
+        slope = (cal7-cal4)/3;
+        intercept = cal4-4*slope;
+        calibrated = true;  
+    }
+    
+  }
+  
+   delay(10);
+   
+// Préparation de la balance   
+Serial.println("Initialisation de la balance...");
+balance.begin(broche_DT, broche_SCK);
+while (!balance.is_ready())
+  {
+    ;
+  }
+balance.set_scale(2266); //calibration: le paramètre dépend de votre cellule de charge.
+balance.tare(); //ajustement du zéro
+Serial.println("La balance est prete ! Le titrage commence dans 1 minute ! Assurez-vous de ne plus toucher à la balance pour ne pas fausser les mesures.");
+delay(60000);
+Serial.println("C'est parti!")
+}
+
+long ReadPH(){
+  int buf[10],temp;
+  float avgValue=0.0;
+  analogRead(pinpH);
+  for(int i=0;i<200;i++){ //50 mesures
+    buf[i]=analogRead(pinpH);
+    delay(10);
+    avgValue+=(float) buf[i];}
+  avgValue/=200;
+  
+  return avgValue;
+}
+
+void loop(){
+digitalWrite(dirPin, HIGH);
+for(int i =0; i<800; i++){
+digitalWrite(stepPin, HIGH);
+delayMicroseconds((acos(i+1)-acos(i))/pul);
+digitalWrite(stepPin, LOW);
+delayMicroseconds((acos(i+1)-acos(i))/pul);
+}
+delay(250);
+Serial.println(balance.get_units(10));
+//Serial.println(" grammes");
+pHRaw= ReadPH();
+pHfull=(pHRaw-intercept)/slope;
+Serial.println(pHfull);
+delay(50);
+}
