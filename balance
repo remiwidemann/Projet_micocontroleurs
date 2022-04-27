@@ -1,5 +1,5 @@
-\\ Code realise par Yves Pelletier.
-\\ Mesure de la masse toutes les secondes.
+// Code realise par Yves Pelletier.
+// Mesure de la masse toutes les secondes.
 
 #include "HX711.h"
 // HX711 circuit wiring
