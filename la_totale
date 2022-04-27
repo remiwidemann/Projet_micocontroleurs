@@ -65,8 +65,8 @@ while(calibrated == false){
     }
     
   }
-  
-   delay(10);
+    Serial.println("Vous avez 1 minute pour placer la sonde à pH sur son support dans la solution à titrer. Attention, elle ne doit pas toucher le bécher ou l'agitateur magnétique !");
+   delay(60000);
    
 // Préparation de la balance   
 Serial.println("Initialisation de la balance...");
@@ -77,8 +77,8 @@ while (!balance.is_ready())
   }
 balance.set_scale(2266); //calibration: le paramètre dépend de votre cellule de charge.
 balance.tare(); //ajustement du zéro
-Serial.println("La balance est prete ! Le titrage commence dans 1 minute ! Assurez-vous de ne plus toucher à la balance pour ne pas fausser les mesures.");
-delay(60000);
+Serial.println("La balance est prete ! Le titrage va commencer ! Assurez-vous de ne plus toucher à la balance pour ne pas fausser les mesures.");
+delay(100);
 Serial.println("C'est parti!")
 }
 
