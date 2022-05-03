@@ -1,4 +1,3 @@
-// Programme initial fourni par Martin Vérot. (Auteur·rice initial·e ?)
 // Ce programme permet de faire tourner le moteur d'un demi-tour (= 800 pas) toutes les secondes.
 
 #define dirPin 3
